@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace App\Notification\Infrastructure\Doctrine\Entity;
 
 use App\Notification\Domain\Enum\NotificationStatus;
-use DateTimeImmutable;
-use Doctrine\ORM\Mapping as ORM;
 use App\Notification\Infrastructure\Doctrine\Repository\NotificationRepository;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
-
 class Notification
 {
     #[ORM\Id]
@@ -31,20 +29,23 @@ class Notification
     private string $message;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private DateTimeImmutable $createdAt;
+    private \DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private \DateTimeImmutable $sentAt;
 
     #[ORM\Column(length: 255)]
     private string $status;
 
-    public function __construct(Uuid $sender, Uuid $receiver, string $title, string $message)
+    public function __construct(Uuid $id, Uuid $sender, Uuid $receiver, string $title, string $message)
     {
-        $this->id = Uuid::v4();
+        $this->id = $id;
         $this->sender = $sender;
         $this->receiver = $receiver;
         $this->title = $title;
         $this->message = $message;
 
-        $this->createdAt = new DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
         $this->updateStatus(NotificationStatus::Created);
     }
 
@@ -93,14 +94,19 @@ class Notification
         $this->message = $message;
     }
 
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeImmutable $createdAt): void
+    public function setCreatedAt(\DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
+    }
+
+    public function getSentAt(): \DateTimeImmutable
+    {
+        return $this->sentAt;
     }
 
     public function getStatus(): NotificationStatus
@@ -111,5 +117,9 @@ class Notification
     public function updateStatus(NotificationStatus $status): void
     {
         $this->status = $status->value;
+
+        if (NotificationStatus::Sent === $status) {
+            $this->sentAt = new \DateTimeImmutable();
+        }
     }
 }

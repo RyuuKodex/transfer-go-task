@@ -9,10 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class NotificationWasCreatedEvent extends Event
 {
-    public Uuid $notificationId;
-
-    public function __construct(Uuid $notificationId)
+    public function __construct(public Uuid $notificationId)
     {
-        $this->notificationId = $notificationId;
     }
 }

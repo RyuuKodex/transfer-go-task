@@ -1,0 +1,28 @@
+parameters:       
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+    _instanceof:
+        App\Notification\Infrastructure\Sender\Strategy\SenderStrategyInterface:
+            tags: [ 'app.sender_strategy' ]
+    
+    App\Notification\Infrastructure\Sender\SenderStrategyProvider:
+        arguments:
+            - !tagged_iterator app.sender_strategy
+
+    App\Tests\Mock\MockTexter: ~
+    
+    App\Tests\Mock\MockMailer: ~
+    
+    App\Notification\Infrastructure\Doctrine\Repository\NotificationRepository:
+        public: true
+
+    App\Notification\Infrastructure\Sender\Strategy\SmsSenderStrategy:
+        arguments:
+            $texter: '@App\Tests\Mock\MockTexter'
+    
+    App\Notification\Infrastructure\Sender\Strategy\EmailSenderStrategy:
+        arguments:
+            $mailer: '@App\Tests\Mock\MockMailer'

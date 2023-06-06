@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsEventListener(event: NotificationWasCreatedEvent::class)]
-final class SendCreatedNotificationListener
+final readonly class SendCreatedNotificationListener
 {
     public function __construct(private MessageBusInterface $messageBus)
     {

@@ -8,12 +8,7 @@ use Symfony\Component\Uid\Uuid;
 
 final readonly class SendNotificationCommand
 {
-    public function __construct(private Uuid $notificationId)
+    public function __construct(public Uuid $notificationId)
     {
-    }
-
-    public function getNotificationId(): Uuid
-    {
-        return $this->notificationId;
     }
 }
