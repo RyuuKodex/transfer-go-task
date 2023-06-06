@@ -19,10 +19,10 @@
 **/Thumbs.db
 .github/
 docs/
-public/bundles/
+app/public/bundles/
 tests/
-var/
-vendor/
+app/var/
+app/vendor/
 .editorconfig
 .env.*.local
 .env.local
