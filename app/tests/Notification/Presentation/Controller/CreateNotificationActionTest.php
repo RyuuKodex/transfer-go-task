@@ -22,7 +22,7 @@ final class CreateNotificationActionTest extends WebTestCase
             'message' => 'message',
         ];
 
-        $client->request('POST', '/notification', content: json_encode($data));
+        $client->request('POST', '/api/notification', content: json_encode($data));
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);

@@ -17,54 +17,54 @@ final class SmsSenderStrategyTest extends TestCase
 {
     public function testSupports(): void
     {
-        $texter = $this->createMock(TexterInterface::class);
+        $texterMock = $this->createMock(TexterInterface::class);
 
-        $smsSenderStrategy = new SmsSenderStrategy($texter);
+        $smsSenderStrategy = new SmsSenderStrategy($texterMock);
 
         self::assertTrue($smsSenderStrategy->supports(new Channel('sms', [])));
     }
 
     public function testDoesntSupports(): void
     {
-        $texter = $this->createMock(TexterInterface::class);
+        $texterMock = $this->createMock(TexterInterface::class);
 
-        $smsSenderStrategy = new SmsSenderStrategy($texter);
+        $smsSenderStrategy = new SmsSenderStrategy($texterMock);
 
         self::assertFalse($smsSenderStrategy->supports(new Channel('email', [])));
     }
 
     public function testSend(): void
     {
-        $texter = $this->createMock(TexterInterface::class);
-        $notification = $this->createMock(Notification::class);
         $channel = new Channel('sms', ['phoneNumber' => '+48 111222333']);
 
-        $texter
+        $texterMock = $this->createMock(TexterInterface::class);
+        $texterMock
             ->expects(self::once())
             ->method('send');
 
-        $smsSenderStrategy = new SmsSenderStrategy($texter);
+        $smsSenderStrategy = new SmsSenderStrategy($texterMock);
 
-        $result = $smsSenderStrategy->send($channel, $notification);
+        $notificationMock = $this->createMock(Notification::class);
+        $result = $smsSenderStrategy->send($channel, $notificationMock);
 
         self::assertInstanceOf(SuccessResult::class, $result);
     }
 
     public function testSendFailed(): void
     {
-        $texter = $this->createMock(TexterInterface::class);
-        $notification = $this->createMock(Notification::class);
         $channel = new Channel('sms', ['phoneNumber' => '+48 111222333']);
-        $exception = $this->createMock(TransportExceptionInterface::class);
 
-        $texter
+        $exceptionMock = $this->createMock(TransportExceptionInterface::class);
+        $texterMock = $this->createMock(TexterInterface::class);
+        $texterMock
             ->expects(self::once())
             ->method('send')
-            ->willThrowException($exception);
+            ->willThrowException($exceptionMock);
 
-        $smsSenderStrategy = new SmsSenderStrategy($texter);
+        $smsSenderStrategy = new SmsSenderStrategy($texterMock);
 
-        $result = $smsSenderStrategy->send($channel, $notification);
+        $notificationMock = $this->createMock(Notification::class);
+        $result = $smsSenderStrategy->send($channel, $notificationMock);
 
         self::assertInstanceOf(FailureResult::class, $result);
     }

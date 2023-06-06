@@ -24,59 +24,59 @@ final class SendNotificationHandlerTest extends TestCase
 {
     public function testSendSuccessfully(): void
     {
-        $notificationStore = $this->createMock(NotificationStoreInterface::class);
-        $senderStrategyProvider = $this->createMock(SenderStrategyProviderInterface::class);
-        $senderStrategy = $this->createMock(SenderStrategyInterface::class);
-        $userHttpClient = $this->createMock(UserHttpClientInterface::class);
-        $canSendNextNotificationSpecification = $this->createMock(CanSendNextNotificationSpecificationInterface::class);
-        $notification = $this->createMock(Notification::class);
 
         $notificationId = Uuid::fromString('4af2b8e5-53d0-4c31-b93f-61c346d3577b');
         $channel = new Channel('sms', ['phoneNumber' => '+48 111 222 333']);
         $user = new User(Uuid::fromString('9c1c5311-4a52-47f2-8267-f9b2ae21b087'), [$channel]);
 
-        $notificationStore
+        $notificationMock = $this->createMock(Notification::class);
+        $notificationStoreMock = $this->createMock(NotificationStoreInterface::class);
+        $notificationStoreMock
             ->expects(self::once())
             ->method('getById')
             ->with($notificationId)
-            ->willReturn($notification);
+            ->willReturn($notificationMock);
 
-        $userHttpClient
+        $userHttpClientMock = $this->createMock(UserHttpClientInterface::class);
+        $userHttpClientMock
             ->expects(self::once())
             ->method('getUserById')
             ->willReturn($user);
 
-        $canSendNextNotificationSpecification
+        $canSendNextNotificationSpecificationMock = $this->createMock(CanSendNextNotificationSpecificationInterface::class);
+        $canSendNextNotificationSpecificationMock
             ->expects(self::once())
             ->method('canSend')
             ->willReturn(true);
 
-        $senderStrategyProvider
+        $senderStrategyMock = $this->createMock(SenderStrategyInterface::class);
+        $senderStrategyProviderMock = $this->createMock(SenderStrategyProviderInterface::class);
+        $senderStrategyProviderMock
             ->expects(self::once())
             ->method('getStrategy')
-            ->willReturn($senderStrategy);
+            ->willReturn($senderStrategyMock);
 
-        $senderStrategy
+        $senderStrategyMock
             ->expects(self::once())
             ->method('send')
             ->willReturn(new SuccessResult());
 
-        $notification->expects(self::once())
+        $notificationMock->expects(self::once())
             ->method('updateStatus')
             ->with(NotificationStatus::Sent);
 
-        $notificationStore
+        $notificationStoreMock
             ->expects(self::once())
             ->method('store')
-            ->with($notification);
+            ->with($notificationMock);
 
         $command = new SendNotificationCommand($notificationId);
 
         $handler = new SendNotificationHandler(
-            $notificationStore,
-            $userHttpClient,
-            $senderStrategyProvider,
-            $canSendNextNotificationSpecification
+            $notificationStoreMock,
+            $userHttpClientMock,
+            $senderStrategyProviderMock,
+            $canSendNextNotificationSpecificationMock
         );
 
         $handler($command);
@@ -84,110 +84,108 @@ final class SendNotificationHandlerTest extends TestCase
 
     public function testNotSentDueToThrottling(): void
     {
-        $notificationStore = $this->createMock(NotificationStoreInterface::class);
-        $senderStrategyProvider = $this->createMock(SenderStrategyProviderInterface::class);
-        $senderStrategy = $this->createMock(SenderStrategyInterface::class);
-        $userHttpClient = $this->createMock(UserHttpClientInterface::class);
-        $canSendNextNotificationSpecification = $this->createMock(CanSendNextNotificationSpecificationInterface::class);
-        $notification = $this->createMock(Notification::class);
-
         $notificationId = Uuid::fromString('4af2b8e5-53d0-4c31-b93f-61c346d3577b');
         $channel = new Channel('sms', ['phoneNumber' => '+48 111 222 333']);
         $user = new User(Uuid::fromString('9c1c5311-4a52-47f2-8267-f9b2ae21b087'), [$channel]);
 
-        $notificationStore
+        $notificationMock = $this->createMock(Notification::class);
+        $notificationStoreMock = $this->createMock(NotificationStoreInterface::class);
+        $notificationStoreMock
             ->expects(self::once())
             ->method('getById')
             ->with($notificationId)
-            ->willReturn($notification);
+            ->willReturn($notificationMock);
 
-        $userHttpClient
+        $userHttpClientMock = $this->createMock(UserHttpClientInterface::class);
+        $userHttpClientMock
             ->expects(self::once())
             ->method('getUserById')
             ->willReturn($user);
 
-        $canSendNextNotificationSpecification
+        $canSendNextNotificationSpecificationMock = $this->createMock(CanSendNextNotificationSpecificationInterface::class);
+        $canSendNextNotificationSpecificationMock
             ->expects(self::once())
             ->method('canSend')
             ->willReturn(false);
 
-        $notification
+        $notificationMock
             ->expects(self::once())
             ->method('updateStatus')
             ->with(NotificationStatus::NotSentDueToThrottling);
 
-        $notificationStore
+        $notificationStoreMock
             ->expects(self::once())
             ->method('store')
-            ->with($notification);
+            ->with($notificationMock);
 
         $command = new SendNotificationCommand($notificationId);
 
+        $senderStrategyProviderMock = $this->createMock(SenderStrategyProviderInterface::class);
+
         $handler = new SendNotificationHandler(
-            $notificationStore,
-            $userHttpClient,
-            $senderStrategyProvider,
-            $canSendNextNotificationSpecification
+            $notificationStoreMock,
+            $userHttpClientMock,
+            $senderStrategyProviderMock,
+            $canSendNextNotificationSpecificationMock
         );
 
         $handler($command);
     }
 
-    public function testNotSent(): void
+    public function testNotSentDueToAllChannelsFailed(): void
     {
-        $notificationStore = $this->createMock(NotificationStoreInterface::class);
-        $senderStrategyProvider = $this->createMock(SenderStrategyProviderInterface::class);
-        $senderStrategy = $this->createMock(SenderStrategyInterface::class);
-        $userHttpClient = $this->createMock(UserHttpClientInterface::class);
-        $canSendNextNotificationSpecification = $this->createMock(CanSendNextNotificationSpecificationInterface::class);
-        $notification = $this->createMock(Notification::class);
-
         $notificationId = Uuid::fromString('4af2b8e5-53d0-4c31-b93f-61c346d3577b');
         $channel = new Channel('sms', ['phoneNumber' => '+48 111 222 333']);
         $user = new User(Uuid::fromString('9c1c5311-4a52-47f2-8267-f9b2ae21b087'), [$channel]);
 
-        $notificationStore
+        $notificationMock = $this->createMock(Notification::class);
+        $notificationStoreMock = $this->createMock(NotificationStoreInterface::class);
+        $notificationStoreMock
             ->expects(self::once())
             ->method('getById')
             ->with($notificationId)
-            ->willReturn($notification);
+            ->willReturn($notificationMock);
 
-        $userHttpClient
+        $userHttpClientMock = $this->createMock(UserHttpClientInterface::class);
+        $userHttpClientMock
             ->expects(self::once())
             ->method('getUserById')
             ->willReturn($user);
 
-        $canSendNextNotificationSpecification
+        $canSendNextNotificationSpecificationMock = $this->createMock(CanSendNextNotificationSpecificationInterface::class);
+        $canSendNextNotificationSpecificationMock
             ->expects(self::once())
             ->method('canSend')
             ->willReturn(true);
 
-        $senderStrategyProvider
+        $senderStrategyMock = $this->createMock(SenderStrategyInterface::class);
+        $senderStrategyProviderMock = $this->createMock(SenderStrategyProviderInterface::class);
+        $senderStrategyProviderMock
             ->expects(self::once())
             ->method('getStrategy')
-            ->willReturn($senderStrategy);
+            ->willReturn($senderStrategyMock);
 
-        $senderStrategy
+        $senderStrategyMock
             ->expects(self::once())
             ->method('send')
             ->willReturn(new FailureResult());
 
-        $notification->expects(self::once())
+        $notificationMock->expects(self::once())
             ->method('updateStatus')
             ->with(NotificationStatus::AllChannelsFailed);
 
-        $notificationStore
+        $notificationStoreMock
             ->expects(self::once())
             ->method('store')
-            ->with($notification);
+            ->with($notificationMock);
 
         $command = new SendNotificationCommand($notificationId);
 
         $handler = new SendNotificationHandler(
-            $notificationStore,
-            $userHttpClient,
-            $senderStrategyProvider,
-            $canSendNextNotificationSpecification
+            $notificationStoreMock,
+            $userHttpClientMock,
+            $senderStrategyProviderMock,
+            $canSendNextNotificationSpecificationMock
         );
 
         $handler($command);

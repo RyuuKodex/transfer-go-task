@@ -48,7 +48,7 @@ final class NotificationRepository extends ServiceEntityRepository implements No
         $notification = $this->find($id);
 
         if (null === $notification) {
-            throw new \RuntimeException();
+            throw new \RuntimeException('No entity with this id found.');
         }
 
         return $notification;

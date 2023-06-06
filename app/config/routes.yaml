@@ -1,0 +1,5 @@
+controllers:
+    resource:
+        path: ../src/Notification/Presentation/Controller/
+        namespace: App\Notification\Presentation\Controller
+    type: attribute

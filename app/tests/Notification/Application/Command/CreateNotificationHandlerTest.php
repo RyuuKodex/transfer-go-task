@@ -23,10 +23,8 @@ final class CreateNotificationHandlerTest extends TestCase
         $title = 'title';
         $message = 'message';
 
-        $notificationStore = $this->createMock(NotificationStoreInterface::class);
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $notificationStore->expects(self::once())
+        $notificationStoreMock = $this->createMock(NotificationStoreInterface::class);
+        $notificationStoreMock->expects(self::once())
             ->method('store')
             ->with(
                 self::callback(fn (Notification $notification): bool => $notification->getId() === $notificationId
@@ -37,7 +35,8 @@ final class CreateNotificationHandlerTest extends TestCase
                 )
             );
 
-        $eventDispatcher->expects(self::once())
+        $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcherMock->expects(self::once())
             ->method('dispatch')
             ->with(
                 self::callback(
@@ -46,7 +45,7 @@ final class CreateNotificationHandlerTest extends TestCase
             );
 
         $command = new CreateNotificationCommand($notificationId, $sender, $receiver, $title, $message);
-        $handler = new CreateNotificationHandler($notificationStore, $eventDispatcher);
+        $handler = new CreateNotificationHandler($notificationStoreMock, $eventDispatcherMock);
 
         $handler($command);
     }

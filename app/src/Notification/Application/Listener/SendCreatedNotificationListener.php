@@ -19,7 +19,6 @@ final readonly class SendCreatedNotificationListener
     public function __invoke(NotificationWasCreatedEvent $event): void
     {
         $command = new SendNotificationCommand($event->notificationId);
-
         $this->messageBus->dispatch($command);
     }
 }

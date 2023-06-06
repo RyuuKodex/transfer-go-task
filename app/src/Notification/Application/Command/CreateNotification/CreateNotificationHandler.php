@@ -31,7 +31,6 @@ final readonly class CreateNotificationHandler
         $this->notificationStore->store($notification);
 
         $event = new NotificationWasCreatedEvent($notification->getId());
-
         $this->eventDispatcher->dispatch($event);
     }
 }

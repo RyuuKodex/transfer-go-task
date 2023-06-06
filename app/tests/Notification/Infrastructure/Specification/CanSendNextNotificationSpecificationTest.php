@@ -13,31 +13,29 @@ final class CanSendNextNotificationSpecificationTest extends TestCase
 {
     public function testCanSend(): void
     {
-        $notificationStore = $this->createMock(NotificationStoreInterface::class);
-        $notification = $this->createMock(Notification::class);
-
-        $notificationStore
+        $notificationStoreMock = $this->createMock(NotificationStoreInterface::class);
+        $notificationStoreMock
             ->expects(self::once())
             ->method('countNotificationInLastHourByReceiver')
             ->willReturn(26);
 
-        $specification = new CanSendNextNotificationSpecification($notificationStore, 300);
+        $specification = new CanSendNextNotificationSpecification($notificationStoreMock, 300);
 
-        self::assertTrue($specification->canSend($notification));
+        $notificationMock = $this->createMock(Notification::class);
+        self::assertTrue($specification->canSend($notificationMock));
     }
 
     public function testCannotSend(): void
     {
-        $notificationStore = $this->createMock(NotificationStoreInterface::class);
-        $notification = $this->createMock(Notification::class);
-
-        $notificationStore
+        $notificationStoreMock = $this->createMock(NotificationStoreInterface::class);
+        $notificationStoreMock
             ->expects(self::once())
             ->method('countNotificationInLastHourByReceiver')
             ->willReturn(332);
 
-        $specification = new CanSendNextNotificationSpecification($notificationStore, 300);
+        $specification = new CanSendNextNotificationSpecification($notificationStoreMock, 300);
 
-        self::assertFalse($specification->canSend($notification));
+        $notificationMock = $this->createMock(Notification::class);
+        self::assertFalse($specification->canSend($notificationMock));
     }
 }

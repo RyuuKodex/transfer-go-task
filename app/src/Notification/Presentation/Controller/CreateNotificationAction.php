@@ -21,7 +21,7 @@ final class CreateNotificationAction extends AbstractController
     }
 
     #[Route('/api/notification', methods: 'POST')]
-    public function create(Request $request): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $content = $request->getContent();
 

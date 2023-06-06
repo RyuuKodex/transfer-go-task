@@ -30,7 +30,7 @@ class SmsSenderStrategy implements SenderStrategyInterface
 
         try {
             $this->texter->send($sms);
-        } catch (TransportExceptionInterface $exception) {
+        } catch (TransportExceptionInterface) {
             return new FailureResult();
         }
 

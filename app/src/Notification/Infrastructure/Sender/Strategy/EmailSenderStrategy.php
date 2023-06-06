@@ -36,7 +36,7 @@ final class EmailSenderStrategy implements SenderStrategyInterface
 
         try {
             $this->mailer->send($email);
-        } catch (TransportExceptionInterface $exception) {
+        } catch (TransportExceptionInterface) {
             return new FailureResult();
         }
 

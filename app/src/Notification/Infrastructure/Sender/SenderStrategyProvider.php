@@ -10,9 +10,8 @@ use App\Notification\Infrastructure\UserService\Dto\Channel;
 final readonly class SenderStrategyProvider implements SenderStrategyProviderInterface
 {
     /** @param SenderStrategyInterface[] $strategies */
-    public function __construct(
-        private iterable $strategies
-    ) {
+    public function __construct(private iterable $strategies)
+    {
     }
 
     public function getStrategy(Channel $channel): SenderStrategyInterface

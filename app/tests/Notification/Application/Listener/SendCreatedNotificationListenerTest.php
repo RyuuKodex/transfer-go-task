@@ -15,17 +15,17 @@ final class SendCreatedNotificationListenerTest extends TestCase
 {
     public function testListener(): void
     {
-        $messageBus = $this->createMock(MessageBusInterface::class);
         $notificationId = Uuid::fromString('4af2b8e5-53d0-4c31-b93f-61c346d3577b');
 
-        $messageBus
+        $messageBusMock = $this->createMock(MessageBusInterface::class);
+        $messageBusMock
             ->expects(self::once())
             ->method('dispatch')
             ->willReturn(new Envelope(new \stdClass()));
 
         $event = new NotificationWasCreatedEvent($notificationId);
 
-        $listener = new SendCreatedNotificationListener($messageBus);
+        $listener = new SendCreatedNotificationListener($messageBusMock);
         $listener($event);
     }
 }

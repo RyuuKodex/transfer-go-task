@@ -17,54 +17,54 @@ final class EmailSenderStrategyTest extends TestCase
 {
     public function testSupports(): void
     {
-        $mailer = $this->createMock(MailerInterface::class);
+        $mailerMock = $this->createMock(MailerInterface::class);
 
-        $emailSenderStrategy = new EmailSenderStrategy($mailer);
+        $emailSenderStrategy = new EmailSenderStrategy($mailerMock);
 
         self::assertTrue($emailSenderStrategy->supports(new Channel('email', [])));
     }
 
     public function testDoesntSupports(): void
     {
-        $mailer = $this->createMock(MailerInterface::class);
+        $mailerMock = $this->createMock(MailerInterface::class);
 
-        $emailSenderStrategy = new EmailSenderStrategy($mailer);
+        $emailSenderStrategy = new EmailSenderStrategy($mailerMock);
 
         self::assertFalse($emailSenderStrategy->supports(new Channel('sms', [])));
     }
 
     public function testSend(): void
     {
-        $mailer = $this->createMock(MailerInterface::class);
-        $notification = $this->createMock(Notification::class);
+        $mailerMock = $this->createMock(MailerInterface::class);
+        $notificationMock = $this->createMock(Notification::class);
         $channel = new Channel('email', ['email' => 'test@email.com']);
 
-        $mailer
+        $mailerMock
             ->expects(self::once())
             ->method('send');
 
-        $emailSenderStrategy = new EmailSenderStrategy($mailer);
+        $emailSenderStrategy = new EmailSenderStrategy($mailerMock);
 
-        $result = $emailSenderStrategy->send($channel, $notification);
+        $result = $emailSenderStrategy->send($channel, $notificationMock);
 
         self::assertInstanceOf(SuccessResult::class, $result);
     }
 
     public function testSendFailed(): void
     {
-        $mailer = $this->createMock(MailerInterface::class);
-        $notification = $this->createMock(Notification::class);
         $channel = new Channel('email', ['email' => 'test2@email.com']);
-        $exception = $this->createMock(TransportExceptionInterface::class);
 
-        $mailer
+        $exceptionMock = $this->createMock(TransportExceptionInterface::class);
+        $mailerMock = $this->createMock(MailerInterface::class);
+        $mailerMock
             ->expects(self::once())
             ->method('send')
-            ->willThrowException($exception);
+            ->willThrowException($exceptionMock);
 
-        $emailSenderStrategy = new EmailSenderStrategy($mailer);
+        $emailSenderStrategy = new EmailSenderStrategy($mailerMock);
 
-        $result = $emailSenderStrategy->send($channel, $notification);
+        $notificationMock = $this->createMock(Notification::class);
+        $result = $emailSenderStrategy->send($channel, $notificationMock);
 
         self::assertInstanceOf(FailureResult::class, $result);
     }
