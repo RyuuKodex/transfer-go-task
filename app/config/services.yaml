@@ -1,0 +1,24 @@
+parameters:
+    app.notification_throttling_threshold: 300
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+    _instanceof:
+        App\Notification\Infrastructure\Sender\Strategy\SenderStrategyInterface:
+            tags: [ 'app.sender_strategy' ]
+            
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            
+    App\Notification\Infrastructure\Sender\SenderStrategyProvider:
+        arguments:
+            - !tagged_iterator app.sender_strategy
+    
+    App\Notification\Infrastructure\Specification\CanSendNextNotificationSpecification:
+        arguments:
+            $throttlingThreshold: "%app.notification_throttling_threshold%"
