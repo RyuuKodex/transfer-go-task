@@ -20,7 +20,7 @@ final class CreateNotificationAction extends AbstractController
     {
     }
 
-    #[Route('/notification', methods: 'POST')]
+    #[Route('/api/notification', methods: 'POST')]
     public function create(Request $request): JsonResponse
     {
         $content = $request->getContent();
